@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>イラストレータータイプ診断</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Light gray background */
+        }
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: #ffffff;
+            border-radius: 12px; /* Rounded corners */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Soft shadow */
+        }
+        .question-card {
+            background-color: #f9fafb; /* Lighter background for question cards */
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e5e7eb; /* Light border */
+        }
+        .button-yes {
+            background-color: #4CAF50; /* Green for YES */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+        .button-yes:hover {
+            background-color: #45a049;
+        }
+        .button-no {
+            background-color: #f44336; /* Red for NO */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+        .button-no:hover {
+            background-color: #da190b;
+        }
+        .button-reset {
+            background-color: #3b82f6; /* Blue for Reset */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+        }
+        .button-reset:hover {
+            background-color: #2563eb;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="container">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">イラストレータータイプ診断</h1>
+        <p class="text-center text-gray-600 mb-8">
+            あなたのイラスト制作に対する考え方やアプローチを診断します。正直な気持ちで答えてみてくださいね！
+        </p>
+
+        <!-- Question Section -->
+        <div id="questions-section">
+            <!-- Question 1 -->
+            <div id="question-1" class="question-card">
+                <p class="text-lg font-semibold text-gray-700 mb-4">Q1. イラストを描くとき、明確なテーマやコンセプトを事前にじっくり考える方ですか？</p>
+                <div class="flex justify-center space-x-4">
+                    <button class="button-yes" onclick="handleAnswer(true)">YES</button>
+                    <button class="button-no" onclick="handleAnswer(false)">NO</button>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div id="question-2" class="question-card hidden">
+                <p class="text-lg font-semibold text-gray-700 mb-4">Q2. 新しい画材やデジタルツール、流行の表現技法などを積極的に試してみることに抵抗がありませんか？</p>
+                <div class="flex justify-center space-x-4">
+                    <button class="button-yes" onclick="handleAnswer(true)">YES</button>
+                    <button class="button-no" onclick="handleAnswer(false)">NO</button>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div id="question-3" class="question-card hidden">
+                <p class="text-lg font-semibold text-gray-700 mb-4">Q3. 自分の描いたイラストについて、他者からの評価や感想を素直に受け入れ、制作に活かしたいと感じますか？</p>
+                <div class="flex justify-center space-x-4">
+                    <button class="button-yes" onclick="handleAnswer(true)">YES</button>
+                    <button class="button-no" onclick="handleAnswer(false)">NO</button>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div id="question-4" class="question-card hidden">
+                <p class="text-lg font-semibold text-gray-700 mb-4">Q4. 一つの作品に時間をかけて、細部までこだわり抜いて完成させたいタイプですか？</p>
+                <div class="flex justify-center space-x-4">
+                    <button class="button-yes" onclick="handleAnswer(true)">YES</button>
+                    <button class="button-no" onclick="handleAnswer(false)">NO</button>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div id="question-5" class="question-card hidden">
+                <p class="text-lg font-semibold text-gray-700 mb-4">Q5. クライアントやフォロワーのニーズに合わせて、自分の画風や表現方法を柔軟に変えることができますか？</p>
+                <div class="flex justify-center space-x-4">
+                    <button class="button-yes" onclick="handleAnswer(true)">YES</button>
+                    <button class="button-no" onclick="handleAnswer(false)">NO</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div id="result-section" class="hidden text-center">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">あなたのイラストレータータイプは...</h2>
+            <div id="result-type" class="text-xl font-bold text-blue-600 mb-4"></div>
+            <p id="result-description" class="text-gray-700 leading-relaxed mb-6"></p>
+            <button class="button-reset" onclick="resetDiagnosis()">もう一度診断する</button>
+        </div>
+    </div>
+
+    <script>
+        // ユーザーの回答を保存する配列 (true: YES, false: NO)
+        let answers = [];
+        // 現在表示されている質問のインデックス
+        let currentQuestionIndex = 1; // 質問は1から始まる
+
+        // 診断結果の定義
+        // キーは 'Q1_Q2_Q3' の形式で、YESは'Y'、NOは'N'
+        const diagnosisTypes = {
+            'Y_Y_Y': {
+                name: 'バランス型プロデューサー',
+                description: (q4, q5) => `
+                    明確なコンセプトを重視し、新しい技術や表現にも意欲的に挑戦します。
+                    さらに、他者の意見やフィードバックを積極的に取り入れ、作品をより良くしていくことに長けています。
+                    まるでプロジェクトを統括するプロデューサーのように、多角的な視点から作品を制作し、周囲を巻き込みながら最高の成果を目指します。
+                    ${q4 ? '細部までこだわり、全体と細部のバランスを取りながら質の高い作品を作り上げます。' : '完璧さよりも、全体的なバランスと効率を重視し、スムーズな制作を心がけます。'}
+                    ${q5 ? 'どんな依頼やニーズにも柔軟に対応し、期待以上の結果を出せるでしょう。' : '自身のスタイルを大切にしつつも、状況に応じて適応するバランス感覚を持っています。'}
+                `
+            },
+            'Y_Y_N': {
+                name: 'テクニカルマスター',
+                description: (q4, q5) => `
+                    しっかりとしたコンセプトを持ちながら、新しい画材やデジタルツール、表現技法を積極的に試すことに情熱を燃やします。
+                    他者の評価よりも、自身の技術的な探求や作品の完成度を追求することに喜びを感じる、まさに技術の達人です。
+                    常に自身のスキルアップを目指し、表現の幅を広げています。
+                    ${q4 ? '技術的な細部に徹底的にこだわり、見る人を唸らせる精巧な作品を生み出します。' : '技術の探求を楽しみつつも、作品全体の印象や新しい表現の試みを重視します。'}
+                    ${q5 ? '自身の技術を活かしつつ、クライアントの要望にも技術的に高度な方法で応えられます。' : '自身の技術や表現スタイルを確立しており、安易に妥協することはありません。'}
+                `
+            },
+            'Y_N_Y': {
+                name: '共感クリエイター',
+                description: (q4, q5) => `
+                    作品のテーマやコンセプトを深く掘り下げることを大切にしつつ、何よりも他者の反応や共感を重視します。
+                    新しい技術を積極的に追うよりも、既存の手法や得意な画風でいかに人々の心に響くかを探求します。
+                    あなたのイラストは、見る人の心に温かく寄り添い、感情を揺さぶる力を持っています。
+                    ${q4 ? '細部まで丁寧に描き込み、見る人の心に深く響くような作品を制作します。' : '完璧さよりも、メッセージ性や感情の伝達を優先する傾向があります。'}
+                    ${q5 ? 'クライアントやフォロワーのニーズを敏感に察知し、それに応じた表現で共感を呼びます。' : '自身の得意な表現方法で、人々の共感を呼ぶ作品を作り続けます。'}
+                `
+            },
+            'Y_N_N': {
+                name: 'ストーリーテラー',
+                description: (q4, q5) => `
+                    独自のコンセプトや世界観を深く掘り下げ、それを表現することに集中します。
+                    流行や他者の意見に左右されることなく、内なるビジョンを形にすることに情熱を注ぐ、まさに語り部のようなイラストレーターです。
+                    あなたの作品には、一つ一つに深い物語が込められています。
+                    ${q4 ? 'その世界観や物語を、細部までこだわり抜いて作り込み、唯一無二の作品を完成させます。' : '物語の全体像やメッセージ性を重視し、細部よりも表現の力強さを優先します。'}
+                    ${q5 ? '自身の表現したい世界を大切にしつつ、その中でクライアントの要望を物語に落とし込むことができます。' : '自身の表現したい世界を最優先し、安易に画風を変えることはありません。'}
+                `
+            },
+            'N_Y_Y': {
+                name: '柔軟なオールラウンダー',
+                description: (q4, q5) => `
+                    事前のコンセプトに縛られず、直感的に制作を始めることが多いタイプです。
+                    しかし、新しい表現や技術には非常に意欲的で、他者の意見も積極的に取り入れます。
+                    様々なスタイルやジャンルに対応できる柔軟性を持っており、どんな依頼にも臨機応変に対応できる、まさに万能選手です。
+                    ${q4 ? '細部へのこだわりを持ちつつも、新しい表現を試す柔軟性も兼ね備えています。' : 'スピード感を持って制作を進め、多様な作品を次々と生み出すことができます。'}
+                    ${q5 ? 'クライアントの要望に合わせて、自身の画風や表現方法を自在に変化させることができます。' : '自身の柔軟性を活かしつつ、新しい挑戦を常に求めています。'}
+                `
+            },
+            'N_Y_N': {
+                name: '直感的な表現者',
+                description: (q4, q5) => `
+                    事前の計画よりも、その場のひらめきや感情を大切に制作します。
+                    新しい表現方法やツールを試すことに抵抗がなく、自身の内面から湧き出るものを自由に形にすることに喜びを感じる、非常に感覚的なタイプです。
+                    他者の評価よりも、自身の感性を優先し、枠にとらわれない表現を追求します。
+                    ${q4 ? '直感的なひらめきを大切にしつつも、作品の細部までこだわり抜き、完成度を高めます。' : '完璧さよりも、勢いや感情が伝わる表現を重視し、スピーディーに作品を完成させます。'}
+                    ${q5 ? '自身の感性を大切にしつつも、時には新しい表現方法でクライアントの期待に応えます。' : '自身の感性や表現したいものを最優先し、他者のニーズに合わせることはあまりありません。'}
+                `
+            },
+            'N_N_Y': {
+                name: '完璧主義の職人',
+                description: (q4, q5) => `
+                    事前のコンセプトや新しい技術の追求よりも、目の前の作品を丁寧に、そして完璧に仕上げることに集中します。
+                    他者の意見も聞き入れ、与えられた課題や既存のスタイルを高いレベルで完成させることに喜びを感じる、まさに熟練の職人です。
+                    あなたの作品は、細部まで行き届いた丁寧な仕事が光ります。
+                    ${q4 ? '一つの作品に膨大な時間をかけ、細部まで徹底的にこだわり抜くことで、非の打ち所のない作品を生み出します。' : '与えられた課題を完璧にこなすことを重視し、効率的な制作も意識します。'}
+                    ${q5 ? '自身の確立された手法を活かしつつ、クライアントの要望に対して最高の品質で応えます。' : '自身の確立された手法やスタイルを大切にし、それを磨き上げることに専念します。'}
+                `
+            },
+            'N_N_N': {
+                name: '孤高のアーティスト',
+                description: (q4, q5) => `
+                    独自の感性に従い、他者の意見や流行、事前の計画にとらわれず、純粋に自己表現を追求します。
+                    特定の画材や手法にこだわり、自分だけの世界を深く掘り下げていくタイプです。
+                    あなたの作品は、他の誰にも真似できない、唯一無二の輝きを放っています。
+                    ${q4 ? '自身の世界観を表現するためなら、どれだけ時間をかけても細部まで妥協しません。' : '完璧さよりも、自身の表現したい核となる部分を追求し、それを形にします。'}
+                    ${q5 ? '自身のスタイルを貫きつつも、その中で新たな表現の可能性を探求します。' : '自身の確立したスタイルや表現を貫き、外部のニーズに合わせて変化することはほとんどありません。'}
+                `
+            }
+        };
+
+        // 指定された質問を表示し、他の質問を非表示にする関数
+        function showQuestion(index) {
+            document.querySelectorAll('.question-card').forEach(card => {
+                card.classList.add('hidden');
+            });
+            const questionElement = document.getElementById(`question-${index}`);
+            if (questionElement) {
+                questionElement.classList.remove('hidden');
+            }
+        }
+
+        // 回答を処理する関数
+        function handleAnswer(answer) {
+            answers.push(answer); // 回答を保存
+
+            if (currentQuestionIndex < 5) {
+                currentQuestionIndex++; // 次の質問へ
+                showQuestion(currentQuestionIndex);
+            } else {
+                // 全ての質問に回答したら結果を表示
+                displayResult();
+            }
+        }
+
+        // 診断結果を表示する関数
+        function displayResult() {
+            // 質問セクションを非表示にし、結果セクションを表示
+            document.getElementById('questions-section').classList.add('hidden');
+            document.getElementById('result-section').classList.remove('hidden');
+
+            // 質問1〜3の回答をキーとして結合
+            const key = answers.slice(0, 3).map(a => a ? 'Y' : 'N').join('_');
+            const q4Answer = answers[3]; // 質問4の回答
+            const q5Answer = answers[4]; // 質問5の回答
+
+            const result = diagnosisTypes[key];
+
+            if (result) {
+                document.getElementById('result-type').textContent = `【${result.name}】`;
+                document.getElementById('result-description').textContent = result.description(q4Answer, q5Answer);
+            } else {
+                document.getElementById('result-type').textContent = '診断エラー';
+                document.getElementById('result-description').textContent = '診断結果を取得できませんでした。もう一度お試しください。';
+            }
+        }
+
+        // 診断をリセットする関数
+        function resetDiagnosis() {
+            answers = []; // 回答をリセット
+            currentQuestionIndex = 1; // 質問インデックスをリセット
+
+            // 結果セクションを非表示にし、最初の質問を表示
+            document.getElementById('result-section').classList.add('hidden');
+            document.getElementById('questions-section').classList.remove('hidden');
+            showQuestion(1);
+        }
+
+        // ページ読み込み時に最初の質問を表示
+        document.addEventListener('DOMContentLoaded', () => {
+            showQuestion(1);
+        });
+    </script>
+</body>
+</html>
